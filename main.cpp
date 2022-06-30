@@ -61,7 +61,6 @@ int main(int argc, char** argv) {
     ATRACE_BEGIN("main");
 
     LOG(DEBUG) << "Detected support for:"
-               << (android::vold::IsFilesystemSupported("exfat") ? " exfat" : "")
                << (android::vold::IsFilesystemSupported("ext4") ? " ext4" : "")
                << (android::vold::IsFilesystemSupported("f2fs") ? " f2fs" : "")
                << (android::vold::IsFilesystemSupported("vfat") ? " vfat" : "");

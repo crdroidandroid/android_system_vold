@@ -20,7 +20,6 @@
 #include "Utils.h"
 #include "VolumeManager.h"
 #include "fs/Exfat.h"
-#include "fs/Ntfs.h"
 #include "fs/Vfat.h"
 
 #include <android-base/logging.h>
@@ -111,11 +110,6 @@ status_t PublicVolume::doMount() {
             LOG(ERROR) << getId() << " failed filesystem check";
             return -EIO;
         }
-    } else if (mFsType == "ntfs" && ntfs::IsSupported()) {
-        if (ntfs::Check(mDevPath)) {
-            LOG(ERROR) << getId() << " failed filesystem check";
-            return -EIO;
-        }
     } else {
         LOG(ERROR) << getId() << " unsupported filesystem " << mFsType;
         return -EIO;
@@ -154,12 +148,6 @@ status_t PublicVolume::doMount() {
         }
     } else if (mFsType == "exfat") {
         if (exfat::Mount(mDevPath, mRawPath, AID_ROOT,
-                         (isVisible ? AID_MEDIA_RW : AID_EXTERNAL_STORAGE), 0007)) {
-            PLOG(ERROR) << getId() << " failed to mount " << mDevPath;
-            return -EIO;
-        }
-    } else if (mFsType == "ntfs") {
-        if (ntfs::Mount(mDevPath, mRawPath, AID_ROOT,
                          (isVisible ? AID_MEDIA_RW : AID_EXTERNAL_STORAGE), 0007)) {
             PLOG(ERROR) << getId() << " failed to mount " << mDevPath;
             return -EIO;
@@ -349,7 +337,7 @@ status_t PublicVolume::doFormat(const std::string& fsType) {
         useVfat = false;
     }
 
-    if (fsType != "ntfs" && !useVfat && !useExfat) {
+    if (!useVfat && !useExfat) {
         LOG(ERROR) << "Unsupported filesystem " << fsType;
         return -EINVAL;
     }
@@ -362,8 +350,6 @@ status_t PublicVolume::doFormat(const std::string& fsType) {
         res = vfat::Format(mDevPath, 0);
     } else if (useExfat) {
         res = exfat::Format(mDevPath);
-    } else if (fsType == "ntfs") {
-        res = ntfs::Format(mDevPath);
     }
 
     if (res != OK) {

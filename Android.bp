@@ -143,6 +143,7 @@ cc_library_static {
         "fs/Ntfs.cpp",
         "fs/Vfat.cpp",
         "model/Disk.cpp",
+        "model/DiskPartition.cpp",
         "model/EmulatedVolume.cpp",
         "model/ObbVolume.cpp",
         "model/PrivateVolume.cpp",
@@ -199,8 +200,6 @@ cc_binary {
 
     required: [
         "mke2fs",
-        "mkfs.exfat",
-        "fsck.exfat",
         "vold_prepare_subdirs",
         "wait_for_keymaster",
     ],

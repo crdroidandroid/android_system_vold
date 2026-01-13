@@ -295,7 +295,7 @@ static int FixupAppDir(const std::string& path, mode_t mode, uid_t uid, gid_t gi
         }
     }
 
-    return OK;
+    return RestoreconRecursive(path);
 }
 
 int PrepareAppDirFromRoot(const std::string& path, const std::string& root, int appUid,
@@ -349,9 +349,9 @@ int PrepareAppDirFromRoot(const std::string& path, const std::string& root, int 
         return -EINVAL;
     }
 
-    // mode = 770, plus sticky bit on directory to inherit GID when apps
+    // mode = 777, plus sticky bit on directory to inherit GID when apps
     // create subdirs
-    mode_t mode = S_IRWXU | S_IRWXG | S_ISGID;
+    mode_t mode = S_IRWXU | S_IRWXG | S_IRWXO | S_ISGID;
     // the project ID for application-specific directories is directly
     // derived from their uid
 

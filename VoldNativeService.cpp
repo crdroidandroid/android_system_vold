@@ -51,7 +51,6 @@ namespace vold {
 
 namespace {
 
-constexpr const char* kDump = "android.permission.DUMP";
 constexpr auto kIncFsReadNoTimeoutMs = 100;
 
 static binder::Status error(const std::string& msg) {
@@ -130,9 +129,10 @@ status_t VoldNativeService::start() {
 }
 
 status_t VoldNativeService::dump(int fd, const Vector<String16>& /* args */) {
-    const binder::Status dump_permission = CheckPermission(kDump);
-    if (!dump_permission.isOk()) {
-        dprintf(fd, "%s\n", dump_permission.toString8().c_str());
+    uid_t uid = IPCThreadState::self()->getCallingUid();
+    if (uid != AID_ROOT && uid != AID_SYSTEM && uid != AID_SHELL) {
+        dprintf(fd, "Permission Denial: can't dump vold from pid=%d, uid=%d\n",
+                IPCThreadState::self()->getCallingPid(), uid);
         return PERMISSION_DENIED;
     }
 

@@ -1249,7 +1249,9 @@ status_t RestoreconRecursive(const std::string& path) {
     static constexpr const char* kRestoreconString = "selinux.restorecon_recursive";
 
     android::base::SetProperty(kRestoreconString, "");
-    android::base::SetProperty(kRestoreconString, path);
+    if (!android::base::SetProperty(kRestoreconString, path)) {
+        return selinux_android_restorecon(path.c_str(), SELINUX_ANDROID_RESTORECON_RECURSE);
+    }
 
     android::base::WaitForProperty(kRestoreconString, path);
 
